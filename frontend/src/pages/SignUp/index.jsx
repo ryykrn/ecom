@@ -1,21 +1,27 @@
 import { useState } from "react";
-import axios from "axios";
-
+import { saveUser } from "./api";
 export function SignUp() {
 
     const [username, setUsername] = useState();
     const [email, setEmail] = useState();
     const [password, setPassword] = useState();
     const [passwordRepeat, setPasswordRepeat] = useState();
+    const [inProgress, setInProgress] = useState(false);
+    const [apiMessage, setApiMessage] = useState("");
 
-    const onSubmit = (event) => {
+    const onSubmit = async (event) => {
         event.preventDefault();
-        axios.post("/api/v1/users", {
+        setInProgress(true);
+        const request = await saveUser({
             username,
             email,
             password
-        })
-
+        });
+        setInProgress(false);
+        setApiMessage(request.data.message);
+        setTimeout(() => {
+            setApiMessage("");
+         }, 2000);
     }
 
     return <div className="container">
@@ -26,6 +32,9 @@ export function SignUp() {
                         <h1>Sign Up</h1>
                     </div>
                     <div className="card-body">
+                        {apiMessage && <div className="alert alert-primary" role="alert">
+                        {apiMessage}
+                        </div>}
                         <div className="mb-3">
                             <label htmlFor="username" className="form-label">Username</label>
                             <input id="username" className="form-control" onInput={(event) => setUsername(event.target.value)} />
@@ -42,7 +51,8 @@ export function SignUp() {
                             <label htmlFor="passwordRepeat" className="form-label">Password Repeat</label>
                             <input id="passwordRepeat" type="password" className="form-control" onInput={(event) => setPasswordRepeat(event.target.value)} />
                         </div>
-                        <button className="btn btn-primary" disabled={!password || password !== passwordRepeat} >Sign Up</button>
+                        <button className="btn btn-primary" disabled={inProgress || (!password || password !== passwordRepeat)}>
+                            {inProgress && <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>} Sign Up</button>
                     </div>
                 </form>
             </div>
