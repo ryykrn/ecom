@@ -11,12 +11,14 @@ import com.ecom.ws.UserRepository;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.ecom.ws.shared.GenericMessage;
+
 
 @RestController
 public class UserController {
 
     @Autowired
-    UserRepository userRepository;
+    UserService userService;
 
     @GetMapping("/api/v1/users")
     public String getUsers(@RequestParam(required=false) String param) {
@@ -24,11 +26,9 @@ public class UserController {
     }
 
     @PostMapping("/api/v1/users")
-    public String postUser(@RequestBody User user) {
-        //TODO: process POST request
-        System.out.println(user);
-        userRepository.save(user);
-        return "";
+    public GenericMessage postUser(@RequestBody User user) {
+        userService.save(user);
+        return new GenericMessage("User created");
     }
     
     
